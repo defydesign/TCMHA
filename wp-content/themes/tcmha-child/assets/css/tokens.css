@@ -1,0 +1,30 @@
+/*
+ * Brand tokens. PLACEHOLDER values until the brand refresh direction is approved (target Jan 22, 2027).
+ * Mirror these as Elementor global variables so the MCP and editor use the same names.
+ * Every text/background pair must meet WCAG 2.2 AA (4.5:1 body, 3:1 large text and UI).
+ */
+:root {
+	--tcmha-color-ink: #1d2528;
+	--tcmha-color-ink-muted: #4a5559;
+	--tcmha-color-surface: #ffffff;
+	--tcmha-color-surface-alt: #f4f6f5;
+	--tcmha-color-primary: #1f5c63;
+	--tcmha-color-on-primary: #ffffff;
+	--tcmha-color-crisis: #a32a1f;
+	--tcmha-color-on-crisis: #ffffff;
+	--tcmha-color-focus: #1a5fb4;
+
+	--tcmha-font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+	--tcmha-font-heading: var(--tcmha-font-body);
+	--tcmha-font-size-base: 1.125rem;
+	--tcmha-line-height: 1.6;
+
+	--tcmha-space-1: 0.25rem;
+	--tcmha-space-2: 0.5rem;
+	--tcmha-space-3: 1rem;
+	--tcmha-space-4: 1.5rem;
+	--tcmha-space-5: 2.5rem;
+
+	--tcmha-radius: 0.5rem;
+	--tcmha-target-min: 44px;
+}

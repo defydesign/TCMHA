@@ -1,0 +1,35 @@
+name: Deploy to WP Engine Dev
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "wp-content/**"
+      - ".github/workflows/deploy-dev.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PHP syntax check
+        run: |
+          find wp-content -name "*.php" -print0 | xargs -0 -n1 php -l
+
+      - name: Deploy theme and plugin to WP Engine Dev
+        uses: wpengine/github-action-for-wpe-deploy@v3
+        with:
+          WPE_SSHG_KEY_PRIVATE: ${{ secrets.WPE_SSHG_KEY_PRIVATE }}
+          WPE_ENV: ${{ vars.WPE_DEV_ENV }}
+          SRC_PATH: "wp-content/"
+          REMOTE_PATH: "wp-content/"
+          # No --delete: only files from this repo are added or updated; other plugins and uploads are untouched.
+          FLAGS: "-azvr --inplace --exclude='.*'"
+          CACHE_CLEAR: true
