@@ -24,12 +24,12 @@ jobs:
           find wp-content -name "*.php" -print0 | xargs -0 -n1 php -l
 
       - name: Deploy theme and plugin to WP Engine Dev
-        uses: wpengine/github-action-for-wpe-deploy@v3
+        uses: wpengine/github-action-wpe-site-deploy@v4
         with:
           WPE_SSHG_KEY_PRIVATE: ${{ secrets.WPE_SSHG_KEY_PRIVATE }}
           WPE_ENV: ${{ vars.WPE_DEV_ENV }}
           SRC_PATH: "wp-content/"
           REMOTE_PATH: "wp-content/"
           # No --delete: only files from this repo are added or updated; other plugins and uploads are untouched.
-          FLAGS: "-azvr --inplace --exclude='.*'"
-          CACHE_CLEAR: true
+          FLAGS: '-azvr --inplace --exclude=".*"'
+          CACHE_CLEAR: "true"
