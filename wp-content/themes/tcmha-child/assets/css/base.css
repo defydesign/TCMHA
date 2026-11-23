@@ -1,0 +1,30 @@
+/* Accessible base styles. Keep small; layout belongs in Elementor. */
+body {
+	color: var(--tcmha-color-ink);
+	background: var(--tcmha-color-surface);
+	font-family: var(--tcmha-font-body);
+	font-size: var(--tcmha-font-size-base);
+	line-height: var(--tcmha-line-height);
+}
+
+/* Visible focus for every interactive element (WCAG 2.4.7, 2.4.13). */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+	outline: 3px solid var(--tcmha-color-focus);
+	outline-offset: 2px;
+}
+
+a {
+	color: var(--tcmha-color-primary);
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.15em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}

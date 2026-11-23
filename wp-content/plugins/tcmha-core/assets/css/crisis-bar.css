@@ -1,0 +1,60 @@
+/* Persistent crisis bar. Colors come from theme tokens, with safe fallbacks. */
+.tcmha-crisis-bar {
+	position: sticky;
+	top: 0;
+	z-index: 9999;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem 1rem;
+	padding: 0.5rem 1rem;
+	background: var(--tcmha-color-crisis, #a32a1f);
+	color: var(--tcmha-color-on-crisis, #fff);
+	font-size: 1rem;
+}
+
+.tcmha-crisis-bar a {
+	display: inline-flex;
+	align-items: center;
+	min-height: var(--tcmha-target-min, 44px);
+	color: inherit;
+	font-weight: 600;
+}
+
+.tcmha-crisis-bar a:focus-visible {
+	outline: 3px solid currentColor;
+	outline-offset: 2px;
+}
+
+.tcmha-crisis-bar__primary {
+	padding: 0 1rem;
+	border: 2px solid currentColor;
+	border-radius: var(--tcmha-radius, 0.5rem);
+	text-decoration: none;
+}
+
+.tcmha-crisis-bar__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0 1.25rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+/* On small screens, show the Get Help Now button and 988 only; the Get Help page lists every option. */
+@media (max-width: 600px) {
+	.tcmha-crisis-bar__actions li:not(:nth-child(2)) {
+		display: none;
+	}
+}
+
+body.admin-bar .tcmha-crisis-bar {
+	top: 32px;
+}
+
+@media (max-width: 782px) {
+	body.admin-bar .tcmha-crisis-bar {
+		top: 46px;
+	}
+}
