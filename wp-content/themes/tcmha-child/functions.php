@@ -9,7 +9,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'TCMHA_THEME_VERSION', '0.1.0' );
+define( 'TCMHA_THEME_VERSION', '0.2.0' );
 
 add_action(
 	'wp_enqueue_scripts',

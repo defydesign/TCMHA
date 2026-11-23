@@ -9,3 +9,4 @@ The contract requires this list, with license terms and ongoing fees, before lau
 | Elementor / Elementor Pro | Page builder | GPL-3.0 / commercial | Pro license via Storiline multi-site license | Storiline | Yes (contract) |
 | WP Engine | Hosting | Commercial | Existing plan | ChangeLine | Yes (contract) |
 | Google Translate plugin | Translation | TBD | TBD | TBD | Pending |
+| Lexend font | Font (self-hosted) | SIL Open Font License 1.1 | None | n/a | Not required (free, open license) |

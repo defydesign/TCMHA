@@ -29,7 +29,7 @@
 .tcmha-crisis-bar__primary {
 	padding: 0 1rem;
 	border: 2px solid currentColor;
-	border-radius: var(--tcmha-radius, 0.5rem);
+	border-radius: var(--tcmha-radius-pill, 999px);
 	text-decoration: none;
 }
 
