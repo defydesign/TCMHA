@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "tcmha-dev-elementor": {
+      "type": "http",
+      "url": "https://tcmhanext.wpenginepowered.com/index.php?rest_route=/mcp/mcp-adapter-default-server"
+    }
+  }
+}
