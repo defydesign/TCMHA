@@ -23,4 +23,6 @@ The deploy only adds or updates files from this repo. It never deletes other plu
 
 - Build with **Atomic (V4) elements only**. The Elementor MCP can only edit V4 layouts.
 - Define colors, type, and spacing as Elementor global variables using the same names as `themes/tcmha-child/assets/css/tokens.css`.
-- Connect the Elementor MCP on Dev only (Elementor > Elementor MCP). Never paste the setup prompt in chat: it contains a live Application Password.
+- Connect the Elementor MCP on Dev only (Elementor > Elementor MCP). Never paste the setup prompt or config in chat: it contains a live Application Password.
+- `.mcp.json` points Claude at the Dev MCP endpoint without credentials. The `Authorization: Basic ...` value lives only in the Claude cloud environment as a **network secret** for host `tcmhanext.wpenginepowered.com`, so it never enters the repo.
+- Use a dedicated WordPress user for the MCP (Editor or Administrator on Dev only), so its Application Password can be revoked without affecting anyone's login.
