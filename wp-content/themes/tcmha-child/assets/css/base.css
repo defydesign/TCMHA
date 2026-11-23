@@ -28,3 +28,13 @@ a {
 		scroll-behavior: auto !important;
 	}
 }
+
+h1,
+h2,
+h3,
+h4 {
+	font-family: var(--tcmha-font-heading);
+	font-weight: 700;
+	line-height: 1.15;
+	color: var(--tcmha-color-primary);
+}
