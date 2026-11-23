@@ -8,8 +8,10 @@
  *   post password), such as the stakeholder progress page.
  * - Everyone else is sent to the "Coming soon" page.
  *
- * The gate is on everywhere except a WordPress environment of type "production". Override with
- * the TCMHA_VISITOR_GATE constant (true or false) in wp-config.php, or the tcmha_visitor_gate_enabled filter.
+ * The gate is on unless the site runs on its public domain (tcmha.org), so it lifts by itself when
+ * the domain moves over at launch. (WP Engine Dev did not report a non-production environment type, so the
+ * WordPress environment type can't be used.) Override with the TCMHA_VISITOR_GATE constant
+ * (true or false) in wp-config.php, or the tcmha_visitor_gate_enabled filter.
  *
  * @package TCMHA_Core
  */
@@ -22,9 +24,13 @@ defined( 'ABSPATH' ) || exit;
  * @return bool
  */
 function tcmha_visitor_gate_enabled() {
-	$enabled = defined( 'TCMHA_VISITOR_GATE' )
-		? (bool) TCMHA_VISITOR_GATE
-		: 'production' !== wp_get_environment_type();
+	if ( defined( 'TCMHA_VISITOR_GATE' ) ) {
+		$enabled = (bool) TCMHA_VISITOR_GATE;
+	} else {
+		$public_hosts = apply_filters( 'tcmha_public_hosts', array( 'tcmha.org', 'www.tcmha.org' ) );
+		$host         = strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
+		$enabled      = ! in_array( $host, $public_hosts, true );
+	}
 
 	return (bool) apply_filters( 'tcmha_visitor_gate_enabled', $enabled );
 }

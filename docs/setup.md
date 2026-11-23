@@ -35,4 +35,4 @@ The deploy only adds or updates files from this repo. It never deletes other plu
 - A page with a WordPress password (Page settings > Visibility > Password protected) can be opened by anyone who has the link and the password. The stakeholder progress page works this way.
 - Everyone else is redirected to the published page with the slug `coming-soon`.
 
-It is on in every environment except one whose WordPress environment type is `production`. To force it on or off, set `define( 'TCMHA_VISITOR_GATE', true );` (or `false`) in `wp-config.php`. **Turn it off at launch.**
+It is on unless the site's home URL is `tcmha.org` or `www.tcmha.org`, so it lifts by itself when the domain moves to the new site at launch. (WP Engine Dev did not report a non-production environment type, so that check can't be used.) To force it on or off, set `define( 'TCMHA_VISITOR_GATE', true );` (or `false`) in `wp-config.php`. **Check at launch that the public can see the site.**
