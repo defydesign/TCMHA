@@ -26,6 +26,15 @@ Chosen November 23, 2026 (pending client review). Source of truth for code is `w
 - **Lexend**, self-hosted (`assets/fonts/lexend-latin-variable.woff2`, weights 400 to 700). No Google Fonts requests, so no visitor data goes to Google.
 - Headings: Lexend Bold, purple. Body: Lexend Regular, 18px, line height 1.6.
 
+## On Dev (Elementor V4)
+
+Set up November 23, 2026 through the Elementor MCP.
+
+- **Variables:** every color in the table above, plus `color-surface`, `color-on-primary`, `color-on-slate`, `color-on-sunrise`, `color-on-crisis`, `color-focus` (#1A5FB4), `color-ink-muted` (#4A4452), `color-border` (#D9D2E3, decorative card borders only); fonts `font-body` and `font-heading` (Lexend); sizes `font-size-sm/base/lg/h4/h3/h2/h1` (h1 and h2 fluid with `clamp`), `space-1` to `space-7`, `radius`, `radius-pill`, `target-min` (44px), `width-content` (72rem), `width-measure` (42rem).
+- **Default tag styles:** h1 to h6 Lexend Bold purple, p Lexend 18px ink, links purple and underlined with a focus ring.
+- **Global classes** (all `tcmha-`): layout `section`, `section-alt`, `container`, `measure`, `grid-2`, `grid-3`, `grid-4`; surfaces `hero`, `card`, `card-lavender`; text `eyebrow`, `lead`, `muted`, `on-dark`; buttons `btn-primary`, `btn-secondary`, `btn-accent`, `btn-outline`, `btn-crisis`; `badge`, `badge-now`, `badge-done`, `swatch`. Modifier classes sit at the top of the class order so they win over base classes.
+- Lists inside a Paragraph element must use the `span` tag. A `<ul>` inside `<p>` is invalid HTML and the browser splits it.
+
 ## Logo
 
 The two-circle mark is a concept. Final logo work is still open.

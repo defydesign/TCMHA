@@ -9,7 +9,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'TCMHA_THEME_VERSION', '0.2.0' );
+define( 'TCMHA_THEME_VERSION', '0.3.0' );
 
 add_action(
 	'wp_enqueue_scripts',
@@ -36,3 +36,9 @@ add_action(
 		load_child_theme_textdomain( 'tcmha', get_stylesheet_directory() . '/languages' );
 	}
 );
+
+/*
+ * Lexend is self-hosted in assets/fonts (see tokens.css). Stop Elementor from also
+ * requesting Google Fonts, so no visitor data goes to Google.
+ */
+add_filter( 'elementor/frontend/print_google_fonts', '__return_false' );
