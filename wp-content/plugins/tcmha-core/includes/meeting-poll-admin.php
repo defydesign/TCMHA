@@ -504,6 +504,50 @@ add_action(
 			)
 		);
 
+		$can_edit = static function ( WP_REST_Request $request ) {
+			return 'tcmha_poll' === get_post_type( (int) $request['id'] ) && current_user_can( 'edit_post', (int) $request['id'] );
+		};
+
+		// Delete all answers (for clearing test answers).
+		register_rest_route(
+			'tcmha/v1',
+			'/polls/(?P<id>\d+)/responses',
+			array(
+				'methods'             => WP_REST_Server::DELETABLE,
+				'permission_callback' => $can_edit,
+				'callback'            => static function ( WP_REST_Request $request ) {
+					delete_post_meta( (int) $request['id'], TCMHA_POLL_RESPONSE_KEY );
+					return rest_ensure_response( tcmha_poll_rest_data( (int) $request['id'] ) );
+				},
+			)
+		);
+
+		// Pick a time (slot) or reopen (empty slot). Never sends email: invites go out only from WP admin.
+		register_rest_route(
+			'tcmha/v1',
+			'/polls/(?P<id>\d+)/lock',
+			array(
+				'methods'             => WP_REST_Server::CREATABLE,
+				'permission_callback' => $can_edit,
+				'args'                => array(
+					'slot' => array(
+						'type'     => 'string',
+						'required' => true,
+					),
+				),
+				'callback'            => static function ( WP_REST_Request $request ) {
+					$poll = tcmha_poll_get( (int) $request['id'] );
+					$slot = (string) $request['slot'];
+					if ( '' !== $slot && ! in_array( $slot, $poll['slots'], true ) ) {
+						return new WP_Error( 'tcmha_poll_bad_slot', __( 'That time is not in this poll.', 'tcmha' ), array( 'status' => 400 ) );
+					}
+					$poll['locked'] = $slot;
+					tcmha_poll_store( $poll['id'], $poll );
+					return rest_ensure_response( tcmha_poll_rest_data( $poll['id'] ) );
+				},
+			)
+		);
+
 		register_rest_route(
 			'tcmha/v1',
 			'/polls/(?P<id>\d+)',
