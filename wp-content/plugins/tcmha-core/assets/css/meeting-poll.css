@@ -584,3 +584,8 @@ body.tcmha-poll-page .tcmha-poll-hero h1 {
 .tcmha-poll__ranked form {
 	margin-top: 0.85rem;
 }
+
+.tcmha-poll--choose .tcmha-poll__names {
+	font-size: 0.95rem;
+	margin: 0.35rem 0 0;
+}
