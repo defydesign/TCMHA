@@ -66,8 +66,7 @@ function tcmha_poll_defaults() {
 		'duration'   => 60,             // Minutes.
 		'tz'         => 'America/Denver',
 		'link'       => '',             // Video meeting link, shown once a time is picked.
-		'organizer'  => '',             // Email that gets a note for each response (optional).
-		'notify'     => false,
+		'send_to'    => array(),        // "Send responses to": emails that get each response. Also the Reply-To on poll emails.
 		'show_names' => true,
 		'locked'     => '',             // The chosen slot, or ''.
 		'key'        => '',
@@ -108,7 +107,7 @@ function tcmha_poll_timezone( $poll ) {
  * Sanitize and save settings. Unknown keys are ignored. Returns the saved settings.
  *
  * @param int   $post_id Poll ID.
- * @param array $input   Raw settings: slots (array or newline string), duration, tz, link, organizer, notify, show_names.
+ * @param array $input   Raw settings: slots (array or newline string), duration, tz, link, send_to (array or comma/newline string), show_names.
  * @return array
  */
 function tcmha_poll_save_settings( $post_id, $input ) {
@@ -142,11 +141,17 @@ function tcmha_poll_save_settings( $post_id, $input ) {
 	if ( isset( $input['link'] ) ) {
 		$poll['link'] = esc_url_raw( trim( (string) $input['link'] ), array( 'https' ) );
 	}
-	if ( isset( $input['organizer'] ) ) {
-		$email             = sanitize_email( (string) $input['organizer'] );
-		$poll['organizer'] = is_email( $email ) ? $email : '';
+	if ( isset( $input['send_to'] ) ) {
+		$list = is_array( $input['send_to'] ) ? $input['send_to'] : preg_split( '/[\s,;]+/', (string) $input['send_to'] );
+		$poll['send_to'] = array();
+		foreach ( $list as $email ) {
+			$email = strtolower( sanitize_email( (string) $email ) );
+			if ( is_email( $email ) && ! in_array( $email, $poll['send_to'], true ) && count( $poll['send_to'] ) < 10 ) {
+				$poll['send_to'][] = $email;
+			}
+		}
 	}
-	foreach ( array( 'notify', 'show_names' ) as $flag ) {
+	foreach ( array( 'show_names' ) as $flag ) {
 		if ( array_key_exists( $flag, $input ) ) {
 			$poll[ $flag ] = rest_sanitize_boolean( $input[ $flag ] );
 		}
@@ -845,6 +850,16 @@ function tcmha_poll_ics( $poll ) {
 }
 
 /**
+ * Reply-To header so replies from people go to the poll's "Send responses to" addresses.
+ *
+ * @param array $poll Poll settings.
+ * @return string[]
+ */
+function tcmha_poll_mail_headers( $poll ) {
+	return $poll['send_to'] ? array( 'Reply-To: ' . implode( ', ', $poll['send_to'] ) ) : array();
+}
+
+/**
  * Sign-off used in poll emails.
  *
  * @return string
@@ -875,18 +890,18 @@ function tcmha_poll_mail_confirmation( $poll, $row, $personal, $updated ) {
 		$personal
 	) . tcmha_poll_mail_signoff();
 
-	wp_mail( $row['email'], $subject, $body );
+	wp_mail( $row['email'], $subject, $body, tcmha_poll_mail_headers( $poll ) );
 }
 
 /**
- * Tell the organizer someone answered (if they asked for it).
+ * Send each response to the poll's "Send responses to" addresses.
  *
  * @param array $poll    Poll settings.
  * @param array $row     Response.
  * @param bool  $updated Whether this was a change.
  */
 function tcmha_poll_mail_organizer( $poll, $row, $updated ) {
-	if ( ! $poll['notify'] || ! $poll['organizer'] ) {
+	if ( ! $poll['send_to'] ) {
 		return;
 	}
 	$title = html_entity_decode( get_the_title( $poll['id'] ), ENT_QUOTES, 'UTF-8' );
@@ -900,7 +915,16 @@ function tcmha_poll_mail_organizer( $poll, $row, $updated ) {
 
 	/* translators: 1: name, 2: poll title */
 	$subject = sprintf( $updated ? __( '%1$s changed their times: %2$s', 'tcmha' ) : __( '%1$s answered: %2$s', 'tcmha' ), $row['name'], $title );
-	$body    = sprintf(
+	$words = array(
+		'yes'   => __( 'Works', 'tcmha' ),
+		'maybe' => __( 'If needed', 'tcmha' ),
+		'no'    => __( "Can't", 'tcmha' ),
+	);
+	$lines = array( $row['name'] . ( ! empty( $row['email'] ) ? ' <' . $row['email'] . '>' : '' ), '' );
+	foreach ( $poll['slots'] as $slot ) {
+		$lines[] = tcmha_poll_slot_label( $poll, $slot )['full'] . ': ' . ( $words[ $row['answers'][ $slot ] ?? '' ] ?? '-' );
+	}
+	$body = implode( "\n", $lines ) . "\n\n" . sprintf(
 		/* translators: 1: number of answers, 2: best times, 3: results link */
 		__( "Answers so far: %1\$d\nBest time so far: %2\$s\n\nSee all results:\n%3\$s", 'tcmha' ),
 		$tally['total'],
@@ -908,7 +932,8 @@ function tcmha_poll_mail_organizer( $poll, $row, $updated ) {
 		admin_url( 'post.php?post=' . $poll['id'] . '&action=edit' )
 	) . tcmha_poll_mail_signoff();
 
-	wp_mail( $poll['organizer'], $subject, $body );
+	$headers = ! empty( $row['email'] ) ? array( 'Reply-To: ' . $row['email'] ) : array();
+	wp_mail( $poll['send_to'], $subject, $body, $headers );
 }
 
 /**
@@ -959,7 +984,7 @@ function tcmha_poll_send_invites( $poll ) {
 		$body .= "\n\n" . __( 'A calendar invite is attached. You can also add it to your calendar here:', 'tcmha' ) . "\n" . add_query_arg( 'ics', '1', tcmha_poll_share_url( $poll['id'] ) );
 		$body .= tcmha_poll_mail_signoff();
 
-		if ( wp_mail( $email, $subject, $body, array(), $attach ) ) {
+		if ( wp_mail( $email, $subject, $body, tcmha_poll_mail_headers( $poll ), $attach ) ) {
 			++$result['sent'];
 		} else {
 			++$result['failed'];
