@@ -77,8 +77,25 @@ function tcmha_visitor_gate_allows_request() {
 		}
 	}
 
-	return false;
+	/**
+	 * Let other features open specific requests, such as meeting polls shared by secret link.
+	 *
+	 * @param bool $allowed Whether the request is allowed.
+	 */
+	return (bool) apply_filters( 'tcmha_visitor_gate_allows_request', false );
 }
+
+// Keep the whole pre-launch site out of search engines while the gate is on.
+add_filter(
+	'wp_robots',
+	static function ( $robots ) {
+		if ( tcmha_visitor_gate_enabled() ) {
+			$robots['noindex']  = true;
+			$robots['nofollow'] = true;
+		}
+		return $robots;
+	}
+);
 
 add_action(
 	'template_redirect',
