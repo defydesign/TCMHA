@@ -134,15 +134,42 @@ add_action(
  * Simple admin: menus and toolbar
  * ------------------------------------------------------------------------------------------- */
 
-add_filter( 'custom_menu_order', '__return_true' );
+/**
+ * Which sidebar group a top-level menu item belongs to.
+ *
+ * Groups, top to bottom: dashboard, content (pages, posts, our content types, media, comments),
+ * design (Elementor, templates, appearance), plugin tools (anything a plugin adds), and site
+ * management (users, plugins, tools, settings).
+ *
+ * @param string $slug Menu slug.
+ * @return string
+ */
+function tcmha_admin_menu_group( $slug ) {
+	if ( 'index.php' === $slug ) {
+		return 'dashboard';
+	}
+	if ( 'edit.php?post_type=elementor_library' === $slug || 'themes.php' === $slug
+		|| str_starts_with( $slug, 'elementor' ) || str_starts_with( $slug, 'e-' ) ) {
+		return 'design';
+	}
+	if ( str_starts_with( $slug, 'edit.php' ) || in_array( $slug, array( 'upload.php', 'edit-comments.php' ), true ) ) {
+		return 'content';
+	}
+	if ( in_array( $slug, array( 'users.php', 'profile.php', 'plugins.php', 'tools.php', 'options-general.php' ), true ) ) {
+		return 'manage';
+	}
+	return 'plugins';
+}
 
-// Most-used items first. Anything not listed keeps its place after these.
-add_filter(
-	'menu_order',
-	static function () {
-		return array(
-			'index.php',
-			'separator1',
+/**
+ * Preferred order inside each group. Items not listed keep their original order after these.
+ *
+ * @return array<string, string[]>
+ */
+function tcmha_admin_menu_priorities() {
+	return array(
+		'dashboard' => array( 'index.php' ),
+		'content'   => array(
 			'edit.php?post_type=page',
 			'edit.php?post_type=tcmha_resource',
 			'edit.php?post_type=tcmha_provider',
@@ -150,7 +177,74 @@ add_filter(
 			'edit.php?post_type=tcmha_poll',
 			'edit.php',
 			'upload.php',
-		);
+			'edit-comments.php',
+		),
+		'design'    => array( 'elementor-home', 'elementor', 'edit.php?post_type=elementor_library', 'themes.php' ),
+		'plugins'   => array(),
+		'manage'    => array( 'users.php', 'profile.php', 'plugins.php', 'tools.php', 'options-general.php' ),
+	);
+}
+
+// Group the sidebar and put a divider between groups. Runs after every plugin has added its menu.
+add_action(
+	'admin_menu',
+	static function () {
+		global $menu, $tcmha_admin_menu_order;
+		if ( ! is_array( $menu ) ) {
+			return;
+		}
+
+		$priorities = tcmha_admin_menu_priorities();
+		$buckets    = array_fill_keys( array_keys( $priorities ), array() );
+
+		foreach ( $menu as $key => $item ) {
+			$slug = $item[2] ?? '';
+			if ( isset( $item[4] ) && str_contains( $item[4], 'wp-menu-separator' ) ) {
+				unset( $menu[ $key ] ); // Core dividers are replaced by ours.
+				continue;
+			}
+			if ( '' !== $slug ) {
+				$buckets[ tcmha_admin_menu_group( $slug ) ][] = $slug;
+			}
+		}
+
+		$order = array();
+		$n     = 0;
+		foreach ( $buckets as $group => $slugs ) {
+			if ( ! $slugs ) {
+				continue;
+			}
+			$rank = array_flip( $priorities[ $group ] );
+			$pos  = array_flip( $slugs );
+			usort(
+				$slugs,
+				static function ( $a, $b ) use ( $rank, $pos ) {
+					$ra = $rank[ $a ] ?? PHP_INT_MAX;
+					$rb = $rank[ $b ] ?? PHP_INT_MAX;
+					return $ra === $rb ? $pos[ $a ] <=> $pos[ $b ] : $ra <=> $rb;
+				}
+			);
+			if ( $order ) {
+				++$n;
+				$sep     = 'separator-tcmha-' . $n;
+				$menu[]  = array( '', 'read', $sep, '', 'wp-menu-separator' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+				$order[] = $sep;
+			}
+			$order = array_merge( $order, $slugs );
+		}
+
+		$tcmha_admin_menu_order = $order; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+	},
+	PHP_INT_MAX
+);
+
+add_filter( 'custom_menu_order', '__return_true' );
+
+add_filter(
+	'menu_order',
+	static function ( $menu_order ) {
+		global $tcmha_admin_menu_order;
+		return ! empty( $tcmha_admin_menu_order ) ? $tcmha_admin_menu_order : $menu_order;
 	}
 );
 
