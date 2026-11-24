@@ -27,6 +27,7 @@
 	margin: 0 0 1.25em;
 }
 .tcmha-q__head { display: flex; flex-wrap: wrap; gap: 0.5em 1em; align-items: center; justify-content: space-between; border-bottom: 1px solid #dcdcde; }
+<<<<<<< HEAD
 .tcmha-poll-admin .tcmha-q__title { flex: 1 1 20em; min-width: 0; border: 0; margin: 0; padding: 0; font-size: 1em; }
 .tcmha-q__head { flex-wrap: nowrap; }
 @media (max-width: 960px) { .tcmha-q__head { flex-wrap: wrap; } }
@@ -62,6 +63,9 @@
 .tcmha-opt { position: relative; padding-left: 2.25em !important; }
 .tcmha-opt > .tcmha-drag { position: absolute; left: 0.75em; top: 1em; }
 @media (prefers-reduced-motion: reduce) { .tcmha-q__toggle::before { transition: none; } }
+=======
+.tcmha-poll-admin .tcmha-q__title { border: 0; margin: 0.75em 0; padding: 0; font-size: 1.1em; color: #625778; }
+>>>>>>> origin/claude/project-thread-wzfety
 .tcmha-q__tools, .tcmha-opt__tools { display: flex; flex-wrap: wrap; gap: 0.5em 1em; align-items: center; }
 .tcmha-q__tools .button, .tcmha-opt__tools .button-link, .tcmha-q__tools .button-link { min-height: 32px; }
 

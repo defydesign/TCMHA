@@ -51,6 +51,7 @@
 		} );
 	}
 
+<<<<<<< HEAD
 	// Accordion: a closed question shows one line (number, question, type, choices).
 	function summarize( q ) {
 		var text = q.querySelector( '.tcmha-q__text' ).value.trim();
@@ -85,6 +86,8 @@
 		} );
 	}
 
+=======
+>>>>>>> origin/claude/project-thread-wzfety
 	function addOption( q, focus ) {
 		var html = oTemplate.split( '__Q__' ).join( q.getAttribute( 'data-q' ) ).split( '__O__' ).join( uid( 'o' ) );
 		var el = fromHTML( html );
@@ -102,7 +105,10 @@
 		addOption( el );
 		syncType( el );
 		renumber();
+<<<<<<< HEAD
 		openOnly( el );
+=======
+>>>>>>> origin/claude/project-thread-wzfety
 		el.querySelector( '.tcmha-q__text' ).focus();
 		say( t.added || 'Added.' );
 	}
@@ -235,6 +241,7 @@
 		var o = btn.closest( '.tcmha-opt' );
 		var c = btn.classList;
 
+<<<<<<< HEAD
 		if ( c.contains( 'tcmha-q__toggle' ) ) {
 			if ( btn.getAttribute( 'aria-expanded' ) === 'true' ) {
 				setOpen( q, false );
@@ -247,13 +254,20 @@
 				setOpen( each, openAll );
 			} );
 		} else if ( c.contains( 'tcmha-q-add' ) ) {
+=======
+		if ( c.contains( 'tcmha-q-add' ) ) {
+>>>>>>> origin/claude/project-thread-wzfety
 			addQuestion();
 		} else if ( c.contains( 'tcmha-q-up' ) || c.contains( 'tcmha-q-down' ) ) {
 			var up = c.contains( 'tcmha-q-up' );
 			if ( move( q, '.tcmha-q', up ) ) {
 				renumber();
 				btn.focus();
+<<<<<<< HEAD
 				say( ( t.movedTo || '' ).replace( '%1$d', questions().indexOf( q ) + 1 ).replace( '%2$d', questions().length ) );
+=======
+				say( ( up ? t.movedUp : t.movedDown ) + ' ' + q.querySelector( '.tcmha-q__title' ).textContent.trim() );
+>>>>>>> origin/claude/project-thread-wzfety
 			}
 		} else if ( c.contains( 'tcmha-q-remove' ) ) {
 			if ( ! window.confirm( t.removeQuestion || 'Remove this question?' ) ) {
@@ -262,7 +276,11 @@
 			var next = q.nextElementSibling || q.previousElementSibling;
 			q.remove();
 			renumber();
+<<<<<<< HEAD
 			( next ? next.querySelector( '.tcmha-q__toggle' ) : root.querySelector( '.tcmha-q-add' ) ).focus();
+=======
+			( next ? next.querySelector( '.tcmha-q__text' ) : root.querySelector( '.tcmha-q-add' ) ).focus();
+>>>>>>> origin/claude/project-thread-wzfety
 			say( t.removed || 'Removed.' );
 		} else if ( c.contains( 'tcmha-o-add' ) ) {
 			addOption( q, true );
@@ -296,6 +314,7 @@
 		}
 	} );
 
+<<<<<<< HEAD
 	root.addEventListener( 'input', function ( e ) {
 		if ( e.target.classList.contains( 'tcmha-q__text' ) ) {
 			e.target.closest( '.tcmha-q' ).querySelector( '.tcmha-q__summary' ).textContent = e.target.value.trim() || t.noText;
@@ -382,4 +401,7 @@
 			setOpen( q, true );
 		} );
 	}
+=======
+	questions().forEach( syncType );
+>>>>>>> origin/claude/project-thread-wzfety
 }() );
