@@ -250,9 +250,10 @@ function tcmha_poll_slot_label( $poll, $slot ) {
 	$time  = sprintf( '%1$s–%2$s %3$s', $from, $to, $zone );
 
 	return array(
-		'day'  => $day,
-		'time' => $time,
-		'full' => $day . ', ' . $time,
+		'day'   => $day,
+		'time'  => $time,
+		'range' => sprintf( '%1$s–%2$s', $from, $to ),
+		'full'  => $day . ', ' . $time,
 	);
 }
 
@@ -526,11 +527,27 @@ add_action(
 			return;
 		}
 		wp_enqueue_style( 'tcmha-meeting-poll', TCMHA_CORE_URL . 'assets/css/meeting-poll.css', array(), TCMHA_CORE_VERSION );
+		wp_add_inline_style(
+			'tcmha-meeting-poll',
+			'@font-face{font-family:"Lexend";font-style:normal;font-weight:400 700;font-display:swap;src:url("' . esc_url( TCMHA_CORE_URL . 'assets/fonts/lexend-latin-variable.woff2' ) . '") format("woff2");}'
+		);
 		wp_enqueue_script( 'tcmha-meeting-poll', TCMHA_CORE_URL . 'assets/js/meeting-poll.js', array(), TCMHA_CORE_VERSION, array( 'strategy' => 'defer' ) );
 	}
 );
 
-// Render the poll under the page's intro text.
+// Poll pages use their own branded template instead of the theme's single template.
+add_filter(
+	'template_include',
+	static function ( $template ) {
+		if ( is_singular( 'tcmha_poll' ) && tcmha_poll_current() ) {
+			return TCMHA_CORE_DIR . 'templates/meeting-poll.php';
+		}
+		return $template;
+	},
+	99
+);
+
+// Fallback: if another template renders the post, show the poll under the intro text.
 add_filter(
 	'the_content',
 	static function ( $content ) {
@@ -629,40 +646,55 @@ function tcmha_poll_render( $poll ) {
 
 				<h2 class="tcmha-poll__heading"><?php esc_html_e( 'When can you join?', 'tcmha' ); ?></h2>
 				<p class="tcmha-poll__lead">
-					<?php esc_html_e( 'Pick one answer for each time. Times are Mountain Time (Colorado).', 'tcmha' ); ?>
+					<?php esc_html_e( 'Pick one answer for each time. All times are Mountain Time (Colorado).', 'tcmha' ); ?>
 					<?php if ( $poll['show_names'] ) : ?>
 						<?php esc_html_e( 'Others with this link can see your name and answers.', 'tcmha' ); ?>
 					<?php endif; ?>
 				</p>
 
-				<?php foreach ( $poll['slots'] as $index => $slot ) : ?>
-					<?php
-					$label   = tcmha_poll_slot_label( $poll, $slot );
-					$row     = $tally['slots'][ $slot ];
-					$current = $mine['answers'][ $slot ] ?? '';
-					$is_best = in_array( $slot, $tally['best'], true );
-					$choices = array(
-						'yes'   => __( 'Works', 'tcmha' ),
-						'maybe' => __( 'If needed', 'tcmha' ),
-						'no'    => __( "Can't", 'tcmha' ),
-					);
-					?>
-					<fieldset class="tcmha-poll__slot<?php echo $is_best ? ' is-best' : ''; ?>">
-						<legend>
-							<span class="tcmha-poll__day"><?php echo esc_html( $label['day'] ); ?></span>
-							<span class="tcmha-poll__time"><?php echo esc_html( $label['time'] ); ?></span>
-						</legend>
-						<?php tcmha_poll_local_hint( $poll, $slot ); ?>
-						<div class="tcmha-poll__choices">
-							<?php foreach ( $choices as $value => $text ) : ?>
-								<label class="tcmha-poll__choice tcmha-poll__choice--<?php echo esc_attr( $value ); ?>">
-									<input type="radio" name="tcmha_poll_answers[<?php echo (int) $index; ?>]" value="<?php echo esc_attr( $value ); ?>" <?php checked( $current, $value ); ?> <?php echo 'yes' === $value ? 'required' : ''; ?>>
-									<span><?php echo esc_html( $text ); ?></span>
-								</label>
-							<?php endforeach; ?>
-						</div>
-						<?php tcmha_poll_render_tally( $poll, $row, $tally['total'], $is_best ); ?>
-					</fieldset>
+				<?php
+				$choices = array(
+					'yes'   => __( 'Works', 'tcmha' ),
+					'maybe' => __( 'If needed', 'tcmha' ),
+					'no'    => __( "Can't", 'tcmha' ),
+				);
+				$days    = array();
+				foreach ( $poll['slots'] as $index => $slot ) {
+					$days[ substr( $slot, 0, 10 ) ][ $index ] = $slot;
+				}
+				?>
+				<?php foreach ( $days as $day_slots ) : ?>
+					<?php $day_label = tcmha_poll_slot_label( $poll, reset( $day_slots ) )['day']; ?>
+					<section class="tcmha-poll__day-group">
+						<h3 class="tcmha-poll__day"><?php echo esc_html( $day_label ); ?></h3>
+						<?php foreach ( $day_slots as $index => $slot ) : ?>
+							<?php
+							$label   = tcmha_poll_slot_label( $poll, $slot );
+							$row     = $tally['slots'][ $slot ];
+							$current = $mine['answers'][ $slot ] ?? '';
+							$is_best = in_array( $slot, $tally['best'], true );
+							?>
+							<fieldset class="tcmha-poll__slot<?php echo $is_best ? ' is-best' : ''; ?>">
+								<legend class="tcmha-poll__time">
+									<span class="tcmha-poll__sr"><?php echo esc_html( $day_label ); ?>, </span><?php echo esc_html( $label['range'] ); ?>
+								</legend>
+								<div class="tcmha-poll__slot-main">
+									<div class="tcmha-poll__choices">
+										<?php foreach ( $choices as $value => $text ) : ?>
+											<label class="tcmha-poll__choice tcmha-poll__choice--<?php echo esc_attr( $value ); ?>">
+												<input type="radio" name="tcmha_poll_answers[<?php echo (int) $index; ?>]" value="<?php echo esc_attr( $value ); ?>" <?php checked( $current, $value ); ?> <?php echo 'yes' === $value ? 'required' : ''; ?>>
+												<span><?php echo esc_html( $text ); ?></span>
+											</label>
+										<?php endforeach; ?>
+									</div>
+									<div class="tcmha-poll__slot-when">
+										<?php tcmha_poll_local_hint( $poll, $slot ); ?>
+										<?php tcmha_poll_render_tally( $poll, $row, $tally['total'], $is_best ); ?>
+									</div>
+								</div>
+							</fieldset>
+						<?php endforeach; ?>
+					</section>
 				<?php endforeach; ?>
 
 				<p class="tcmha-poll__submit">
