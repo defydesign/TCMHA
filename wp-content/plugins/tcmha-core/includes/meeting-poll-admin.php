@@ -53,12 +53,11 @@ function tcmha_poll_settings_box( $post ) {
 		<span id="tcmha-poll-link-hint" class="description"><?php esc_html_e( 'Shown on the page and in the invite once you pick a time.', 'tcmha' ); ?></span>
 	</p>
 	<p>
-		<label for="tcmha-poll-organizer"><strong><?php esc_html_e( 'Organizer email', 'tcmha' ); ?></strong></label><br>
-		<input type="email" id="tcmha-poll-organizer" name="tcmha_poll[organizer]" value="<?php echo esc_attr( $poll['organizer'] ); ?>" class="regular-text">
+		<label for="tcmha-poll-send-to"><strong><?php esc_html_e( 'Send responses to', 'tcmha' ); ?></strong></label><br>
+		<input type="text" id="tcmha-poll-send-to" name="tcmha_poll[send_to]" value="<?php echo esc_attr( implode( ', ', $poll['send_to'] ) ); ?>" class="large-text" aria-describedby="tcmha-poll-send-to-hint" autocomplete="off">
+		<span id="tcmha-poll-send-to-hint" class="description"><?php esc_html_e( 'One or more email addresses, separated by commas. Each response is emailed here, and replies to poll emails come here too. Leave blank for no emails.', 'tcmha' ); ?></span>
 	</p>
 	<p>
-		<input type="hidden" name="tcmha_poll[notify]" value="0">
-		<label><input type="checkbox" name="tcmha_poll[notify]" value="1" <?php checked( $poll['notify'] ); ?>> <?php esc_html_e( 'Email the organizer each time someone answers', 'tcmha' ); ?></label><br>
 		<input type="hidden" name="tcmha_poll[show_names]" value="0">
 		<label><input type="checkbox" name="tcmha_poll[show_names]" value="1" <?php checked( $poll['show_names'] ); ?>> <?php esc_html_e( 'Show names to everyone with the link', 'tcmha' ); ?></label>
 	</p>
@@ -423,8 +422,10 @@ add_action(
 			'duration'   => array( 'type' => 'integer' ),
 			'tz'         => array( 'type' => 'string' ),
 			'link'       => array( 'type' => 'string' ),
-			'organizer'  => array( 'type' => 'string' ),
-			'notify'     => array( 'type' => 'boolean' ),
+			'send_to'    => array(
+				'type'  => array( 'array', 'string' ),
+				'items' => array( 'type' => 'string' ),
+			),
 			'show_names' => array( 'type' => 'boolean' ),
 		);
 
@@ -443,7 +444,7 @@ add_action(
 				wp_update_post( $post );
 			}
 			$input = array();
-			foreach ( array( 'slots', 'duration', 'tz', 'link', 'organizer', 'notify', 'show_names' ) as $field ) {
+			foreach ( array( 'slots', 'duration', 'tz', 'link', 'send_to', 'show_names' ) as $field ) {
 				if ( null !== $request[ $field ] ) {
 					$input[ $field ] = $request[ $field ];
 				}
