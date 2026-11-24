@@ -906,34 +906,60 @@ function tcmha_poll_mail_organizer( $poll, $row, $updated ) {
 	}
 	$title = html_entity_decode( get_the_title( $poll['id'] ), ENT_QUOTES, 'UTF-8' );
 	$tally = tcmha_poll_tally( $poll, tcmha_poll_responses( $poll['id'] ) );
-	$best  = array_map(
-		static function ( $slot ) use ( $poll ) {
-			return tcmha_poll_slot_label( $poll, $slot )['full'];
-		},
-		$tally['best']
-	);
 
 	/* translators: 1: name, 2: poll title */
 	$subject = sprintf( $updated ? __( '%1$s changed their times: %2$s', 'tcmha' ) : __( '%1$s answered: %2$s', 'tcmha' ), $row['name'], $title );
-	$words = array(
-		'yes'   => __( 'Works', 'tcmha' ),
-		'maybe' => __( 'If needed', 'tcmha' ),
-		'no'    => __( "Can't", 'tcmha' ),
+
+	$lines = array( $row['name'] . ( ! empty( $row['email'] ) ? ' (' . $row['email'] . ')' : '' ) );
+	$groups = array(
+		'yes'   => __( 'WORKS', 'tcmha' ),
+		'maybe' => __( 'IF NEEDED', 'tcmha' ),
+		'no'    => __( "CAN'T", 'tcmha' ),
 	);
-	$lines = array( $row['name'] . ( ! empty( $row['email'] ) ? ' <' . $row['email'] . '>' : '' ), '' );
-	foreach ( $poll['slots'] as $slot ) {
-		$lines[] = tcmha_poll_slot_label( $poll, $slot )['full'] . ': ' . ( $words[ $row['answers'][ $slot ] ?? '' ] ?? '-' );
+	foreach ( $groups as $answer => $heading ) {
+		$slots = array_keys( array_intersect( $row['answers'], array( $answer ) ) );
+		$lines[] = '';
+		$lines[] = $heading;
+		$lines   = array_merge( $lines, $slots ? tcmha_poll_mail_day_lines( $poll, $slots ) : array( '  ' . __( 'None', 'tcmha' ) ) );
 	}
-	$body = implode( "\n", $lines ) . "\n\n" . sprintf(
-		/* translators: 1: number of answers, 2: best times, 3: results link */
-		__( "Answers so far: %1\$d\nBest time so far: %2\$s\n\nSee all results:\n%3\$s", 'tcmha' ),
-		$tally['total'],
-		$best ? implode( '; ', $best ) : __( 'none yet', 'tcmha' ),
-		admin_url( 'post.php?post=' . $poll['id'] . '&action=edit' )
-	) . tcmha_poll_mail_signoff();
+
+	$lines[] = '';
+	$lines[] = __( 'All times are Mountain Time.', 'tcmha' );
+	$lines[] = '';
+	/* translators: %d: number of answers */
+	$lines[] = sprintf( _n( 'So far: %d answer.', 'So far: %d answers.', $tally['total'], 'tcmha' ), $tally['total'] );
+	if ( $tally['best'] ) {
+		$lines[] = _n( 'Best time so far:', 'Best times so far (tied):', count( $tally['best'] ), 'tcmha' );
+		$lines   = array_merge( $lines, tcmha_poll_mail_day_lines( $poll, $tally['best'] ) );
+	}
+	$lines[] = '';
+	$lines[] = __( 'See all answers (sign in first):', 'tcmha' );
+	$lines[] = admin_url( 'post.php?post=' . $poll['id'] . '&action=edit' );
 
 	$headers = ! empty( $row['email'] ) ? array( 'Reply-To: ' . $row['email'] ) : array();
-	wp_mail( $poll['send_to'], $subject, $body, $headers );
+	wp_mail( $poll['send_to'], $subject, implode( "\n", $lines ) . tcmha_poll_mail_signoff(), $headers );
+}
+
+/**
+ * Slots as one line per day, in order: "  Fri, Dec 11: 9:00–10:00 AM, 3:00–4:00 PM".
+ *
+ * @param array    $poll  Poll settings.
+ * @param string[] $slots Slot strings.
+ * @return string[]
+ */
+function tcmha_poll_mail_day_lines( $poll, $slots ) {
+	sort( $slots );
+	$days = array();
+	foreach ( $slots as $slot ) {
+		list( $start ) = tcmha_poll_slot_range( $poll, $slot );
+		$day           = wp_date( 'D, M j', $start->getTimestamp(), tcmha_poll_timezone( $poll ) );
+		$days[ $day ][] = tcmha_poll_slot_label( $poll, $slot )['range'];
+	}
+	$lines = array();
+	foreach ( $days as $day => $ranges ) {
+		$lines[] = '  ' . $day . ': ' . implode( ', ', $ranges );
+	}
+	return $lines;
 }
 
 /**
