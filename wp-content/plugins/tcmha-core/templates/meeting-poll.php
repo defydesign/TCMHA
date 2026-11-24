@@ -9,7 +9,8 @@
 defined( 'ABSPATH' ) || exit;
 
 $tcmha_poll  = tcmha_poll_current();
-$tcmha_intro = get_post_field( 'post_content', get_queried_object_id() );
+$tcmha_intro  = get_post_field( 'post_content', get_queried_object_id() );
+$tcmha_choose = $tcmha_poll && tcmha_poll_choose_mode( $tcmha_poll );
 ?><!doctype html>
 <html <?php language_attributes(); ?>>
 <head>
@@ -34,9 +35,9 @@ $tcmha_intro = get_post_field( 'post_content', get_queried_object_id() );
 <main id="tcmha-poll-main" tabindex="-1">
 	<section class="tcmha-poll-hero">
 		<div class="tcmha-poll-wrap">
-			<p class="tcmha-poll-eyebrow"><?php esc_html_e( 'Meeting poll', 'tcmha' ); ?></p>
+			<p class="tcmha-poll-eyebrow"><?php echo $tcmha_choose ? esc_html__( 'Meeting poll: for the organizer', 'tcmha' ) : esc_html__( 'Meeting poll', 'tcmha' ); ?></p>
 			<h1><?php echo esc_html( get_the_title() ); ?></h1>
-			<?php if ( '' !== trim( (string) $tcmha_intro ) ) : ?>
+			<?php if ( ! $tcmha_choose && '' !== trim( (string) $tcmha_intro ) ) : ?>
 				<div class="tcmha-poll-lead"><?php echo wp_kses_post( wpautop( $tcmha_intro ) ); ?></div>
 			<?php endif; ?>
 		</div>
@@ -45,7 +46,9 @@ $tcmha_intro = get_post_field( 'post_content', get_queried_object_id() );
 	<section class="tcmha-poll-body">
 		<div class="tcmha-poll-wrap">
 			<?php
-			if ( $tcmha_poll ) {
+			if ( $tcmha_choose ) {
+				echo tcmha_poll_render_choose( $tcmha_poll ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside.
+			} elseif ( $tcmha_poll ) {
 				echo tcmha_poll_render( $tcmha_poll ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside.
 			}
 			?>

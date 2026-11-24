@@ -44,6 +44,11 @@ function tcmha_poll_settings_box( $post ) {
 		<input type="number" id="tcmha-poll-duration" name="tcmha_poll[duration]" min="15" max="600" step="15" value="<?php echo esc_attr( $poll['duration'] ); ?>">
 	</p>
 	<p>
+		<label for="tcmha-poll-deadline"><strong><?php esc_html_e( 'Answer by (deadline)', 'tcmha' ); ?></strong></label><br>
+		<input type="datetime-local" id="tcmha-poll-deadline" name="tcmha_poll[deadline]" value="<?php echo esc_attr( str_replace( ' ', 'T', $poll['deadline'] ) ); ?>" aria-describedby="tcmha-poll-deadline-hint">
+		<span id="tcmha-poll-deadline-hint" class="description"><?php esc_html_e( 'In the poll\'s time zone. Answers close then, and the final tally plus a link to choose the time is emailed to the "Send responses to" addresses. The time is never picked automatically.', 'tcmha' ); ?></span>
+	</p>
+	<p>
 		<label for="tcmha-poll-tz"><strong><?php esc_html_e( 'Time zone', 'tcmha' ); ?></strong></label><br>
 		<input type="text" id="tcmha-poll-tz" name="tcmha_poll[tz]" value="<?php echo esc_attr( $poll['tz'] ); ?>" class="regular-text">
 	</p>
@@ -129,6 +134,28 @@ function tcmha_poll_results_box( $post ) {
 			<label for="tcmha-poll-share"><strong><?php esc_html_e( 'Link to share', 'tcmha' ); ?></strong></label><br>
 			<input type="text" id="tcmha-poll-share" class="large-text code" readonly value="<?php echo esc_attr( $share ); ?>" onfocus="this.select()">
 			<span class="description"><?php esc_html_e( 'Only people with this link can open the poll.', 'tcmha' ); ?></span>
+		</p>
+		<p>
+			<label for="tcmha-poll-choose"><strong><?php esc_html_e( 'Organizer link: choose the final time', 'tcmha' ); ?></strong></label><br>
+			<input type="text" id="tcmha-poll-choose" class="large-text code" readonly value="<?php echo esc_attr( tcmha_poll_choose_url( $post->ID ) ); ?>" onfocus="this.select()">
+			<span class="description"><?php esc_html_e( 'Keep this private. Anyone with it can pick the time and send the invites. It is also in the final tally email.', 'tcmha' ); ?></span>
+		</p>
+		<p>
+			<?php
+			$tally_sent = (int) get_post_meta( $post->ID, '_tcmha_poll_tally_sent', true );
+			if ( $tally_sent ) {
+				/* translators: %s: date and time */
+				echo esc_html( sprintf( __( 'Final tally emailed %s.', 'tcmha' ), wp_date( 'M j, g:i A', $tally_sent, tcmha_poll_timezone( $poll ) ) ) ) . ' ';
+			} elseif ( '' !== $poll['deadline'] ) {
+				/* translators: %s: deadline */
+				echo esc_html( sprintf( __( 'Final tally will be emailed after %s.', 'tcmha' ), tcmha_poll_deadline_label( $poll ) ) ) . ' ';
+			}
+			if ( $poll['send_to'] ) :
+				?>
+				<a class="button" href="<?php echo esc_url( tcmha_poll_action_url( 'tally', $post->ID ) ); ?>"><?php esc_html_e( 'Email the tally now', 'tcmha' ); ?></a>
+			<?php else : ?>
+				<?php esc_html_e( 'Add "Send responses to" addresses to get the final tally by email.', 'tcmha' ); ?>
+			<?php endif; ?>
 		</p>
 		<?php
 	}
@@ -276,6 +303,15 @@ add_action(
 );
 
 add_action(
+	'admin_post_tcmha_poll_tally',
+	static function () {
+		$poll = tcmha_poll_admin_guard( 'tally' );
+		$sent = tcmha_poll_mail_final_tally( $poll );
+		tcmha_poll_admin_back( $poll['id'], $sent ? __( 'Tally emailed.', 'tcmha' ) : __( 'The tally could not be emailed. Check "Send responses to".', 'tcmha' ) );
+	}
+);
+
+add_action(
 	'admin_post_tcmha_poll_unlock',
 	static function () {
 		$poll           = tcmha_poll_admin_guard( 'unlock' );
@@ -392,6 +428,8 @@ function tcmha_poll_rest_data( $post_id, $responses = true ) {
 		'best'      => $tally['best'],
 		'slots'     => $slots,
 		'last_send' => get_post_meta( $post_id, '_tcmha_poll_last_send', true ),
+		'choose_url' => 'publish' === get_post_status( $post_id ) ? tcmha_poll_choose_url( $post_id ) : '',
+		'tally_sent' => (int) get_post_meta( $post_id, '_tcmha_poll_tally_sent', true ),
 	);
 	if ( $responses ) {
 		$data['responses'] = array_map(
@@ -427,6 +465,7 @@ add_action(
 				'items' => array( 'type' => 'string' ),
 			),
 			'show_names' => array( 'type' => 'boolean' ),
+			'deadline'   => array( 'type' => 'string' ),
 		);
 
 		$save = static function ( WP_REST_Request $request, $post_id ) {
@@ -444,7 +483,7 @@ add_action(
 				wp_update_post( $post );
 			}
 			$input = array();
-			foreach ( array( 'slots', 'duration', 'tz', 'link', 'send_to', 'show_names' ) as $field ) {
+			foreach ( array( 'slots', 'duration', 'tz', 'link', 'send_to', 'show_names', 'deadline' ) as $field ) {
 				if ( null !== $request[ $field ] ) {
 					$input[ $field ] = $request[ $field ];
 				}

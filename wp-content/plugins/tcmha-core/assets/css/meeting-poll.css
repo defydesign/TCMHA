@@ -564,3 +564,23 @@ body.tcmha-poll-page .tcmha-poll-hero h1 {
 .tcmha-poll-footer p {
 	margin: 0.25rem 0;
 }
+
+/* Organizer's choose page */
+.tcmha-poll__ranked {
+	list-style: none;
+	margin: 1.5rem 0 0;
+	padding: 0;
+}
+
+.tcmha-poll__ranked .tcmha-poll__day-group {
+	padding-bottom: 1.1rem;
+}
+
+.tcmha-poll__ranked .tcmha-poll__day-group.is-best {
+	border-color: var(--poll-primary);
+	box-shadow: 0 0 0 4px #fff;
+}
+
+.tcmha-poll__ranked form {
+	margin-top: 0.85rem;
+}

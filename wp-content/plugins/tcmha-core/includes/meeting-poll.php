@@ -69,6 +69,7 @@ function tcmha_poll_defaults() {
 		'send_to'    => array(),        // "Send responses to": emails that get each response. Also the Reply-To on poll emails.
 		'show_names' => true,
 		'locked'     => '',             // The chosen slot, or ''.
+		'deadline'   => '',             // 'Y-m-d H:i' in the poll's time zone; answers close then and the final tally is emailed.
 		'key'        => '',
 	);
 }
@@ -149,6 +150,14 @@ function tcmha_poll_save_settings( $post_id, $input ) {
 			if ( is_email( $email ) && ! in_array( $email, $poll['send_to'], true ) && count( $poll['send_to'] ) < 10 ) {
 				$poll['send_to'][] = $email;
 			}
+		}
+	}
+	if ( isset( $input['deadline'] ) ) {
+		$raw  = str_replace( 'T', ' ', trim( sanitize_text_field( (string) $input['deadline'] ) ) );
+		$date = '' === $raw ? false : DateTimeImmutable::createFromFormat( '!Y-m-d H:i', substr( $raw, 0, 16 ), $tz );
+		$poll['deadline'] = $date ? $date->format( 'Y-m-d H:i' ) : '';
+		if ( $poll['deadline'] !== (string) get_post_meta( $post_id, '_tcmha_poll_tally_for', true ) ) {
+			delete_post_meta( $post_id, '_tcmha_poll_tally_sent' ); // A new deadline gets a new final tally.
 		}
 	}
 	foreach ( array( 'show_names' ) as $flag ) {
@@ -449,7 +458,7 @@ function tcmha_poll_handle_response( $poll ) {
 	if ( ! isset( $_POST['tcmha_poll_nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['tcmha_poll_nonce'] ) ), 'tcmha_poll_respond_' . $poll['id'] ) ) {
 		$fail( 'expired' );
 	}
-	if ( '' !== $poll['locked'] ) {
+	if ( tcmha_poll_is_closed( $poll ) ) {
 		$fail( 'closed' );
 	}
 	// Honeypot: people never see this field.
@@ -585,7 +594,7 @@ function tcmha_poll_render( $poll ) {
 	$tz        = tcmha_poll_timezone( $poll );
 	$errors    = array(
 		'expired' => __( 'This page was open a long time, so we could not save. Please choose your times again and press Save.', 'tcmha' ),
-		'closed'  => __( 'A time has already been picked, so answers are closed.', 'tcmha' ),
+		'closed'  => __( 'Answers are closed for this poll.', 'tcmha' ),
 		'busy'    => __( 'Too many tries from this device. Please wait an hour and try again.', 'tcmha' ),
 		'name'    => __( 'Please type your name.', 'tcmha' ),
 		'email'   => __( 'That email address does not look right. Please check it, or leave it blank.', 'tcmha' ),
@@ -622,6 +631,11 @@ function tcmha_poll_render( $poll ) {
 					<?php endif; ?>
 				</p>
 			</section>
+		<?php elseif ( tcmha_poll_is_closed( $poll ) ) : ?>
+			<section class="tcmha-poll__picked" aria-labelledby="tcmha-poll-closed">
+				<h2 id="tcmha-poll-closed"><?php esc_html_e( 'Answers are closed', 'tcmha' ); ?></h2>
+				<p><?php esc_html_e( 'Thank you for answering. We will email the final time and a calendar invite to everyone who left an email address.', 'tcmha' ); ?></p>
+			</section>
 		<?php elseif ( ! $poll['slots'] ) : ?>
 			<p><?php esc_html_e( 'Times will be added soon.', 'tcmha' ); ?></p>
 		<?php else : ?>
@@ -652,6 +666,9 @@ function tcmha_poll_render( $poll ) {
 				<h2 class="tcmha-poll__heading"><?php esc_html_e( 'When can you join?', 'tcmha' ); ?></h2>
 				<p class="tcmha-poll__lead">
 					<?php esc_html_e( 'Pick one answer for each time. All times are Mountain Time (Colorado).', 'tcmha' ); ?>
+					<?php if ( '' !== $poll['deadline'] ) : ?>
+						<strong><?php echo esc_html( sprintf( /* translators: %s: date and time */ __( 'Please answer by %s.', 'tcmha' ), tcmha_poll_deadline_label( $poll ) ) ); ?></strong>
+					<?php endif; ?>
 					<?php if ( $poll['show_names'] ) : ?>
 						<?php esc_html_e( 'Others with this link can see your name and answers.', 'tcmha' ); ?>
 					<?php endif; ?>
