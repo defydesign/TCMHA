@@ -161,3 +161,9 @@ body.login { background: #f4f1f8; color: #1e1a22; }
 .tcmha-login-help p { margin: 0; }
 .tcmha-login-help a { color: #a3261b; font-weight: 700; }
 .tcmha-login-help a:focus { box-shadow: 0 0 0 2px #1a5fb4; outline: 2px solid transparent; }
+
+/* ---------- Sidebar group dividers ---------- */
+
+#adminmenu li.wp-menu-separator { height: 1px; margin: 8px 12px; padding: 0; background: #d9d2e3; }
+#adminmenu div.separator { display: none; }
+.folded #adminmenu li.wp-menu-separator { margin: 8px 6px; }
