@@ -36,3 +36,14 @@ The deploy only adds or updates files from this repo. It never deletes other plu
 - Everyone else is redirected to the published page with the slug `coming-soon`.
 
 It is on unless the site's home URL is `tcmha.org` or `www.tcmha.org`, so it lifts by itself when the domain moves to the new site at launch. (WP Engine Dev did not report a non-production environment type, so that check can't be used.) To force it on or off, set `define( 'TCMHA_VISITOR_GATE', true );` (or `false`) in `wp-config.php`. **Check at launch that the public can see the site.**
+
+## WordPress admin look and feel
+
+Lives in `tcmha-core/includes/admin-brand.php` with `assets/css/admin.css` and `admin-colors.css`. No third-party plugins.
+
+- **Login page:** TCMHA mark and name, Lexend, pill buttons, and a "Need help right now? Call or text 988 / Call 911" box.
+- **Colors:** a "TCMHA" admin color scheme (light lavender menu, purple toolbar). It is the default for anyone still on WordPress's default scheme; people can pick another under Profile.
+- **Buttons and fields:** WordPress buttons are pills that match the site's `tcmha-btn-primary` and `tcmha-btn-outline`. Focus rings use `color-focus` (#1A5FB4).
+- **Simple admin:** on by default for everyone who is not an administrator. Hides Comments, Tools, Templates, Appearance, Plugins, Users, Settings, Elementor settings, and update notices. Administrators can preview it under Profile > Simple admin. Hiding a menu does not change what anyone is allowed to do.
+- **Dashboard:** a welcome box with quick links (only the ones the person can use) and a "Waiting for review" box listing pending pages, posts, resources, providers, and glossary words. WordPress news and Quick Draft are removed.
+- **Footer:** "Need help?" with the site's admin email. Change it with the `tcmha_admin_support_email` filter.
