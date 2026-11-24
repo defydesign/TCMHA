@@ -86,6 +86,14 @@ add_action(
 				'movedDown'      => __( 'Moved down.', 'tcmha' ),
 				'removed'        => __( 'Removed.', 'tcmha' ),
 				'added'          => __( 'Added.', 'tcmha' ),
+				'noText'         => __( '(no question yet)', 'tcmha' ),
+				'typeSingle'     => __( 'Pick one', 'tcmha' ),
+				'typeMultiple'   => __( 'Pick one or more', 'tcmha' ),
+				'typeText'       => __( 'Written answer', 'tcmha' ),
+				'oneChoice'      => __( '1 choice', 'tcmha' ),
+				'choices'        => __( '%d choices', 'tcmha' ), // phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
+				'requiredShort'  => __( 'required', 'tcmha' ),
+				'movedTo'        => __( 'Moved. Now question %1$d of %2$d.', 'tcmha' ), // phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
 			)
 		);
 	}
@@ -177,6 +185,7 @@ function tcmha_survey_admin_option( $qid, $o ) {
 	$fid  = 'tcmha-o-' . $qid . '-' . $o['id'];
 	?>
 	<li class="tcmha-opt" data-o="<?php echo esc_attr( $o['id'] ); ?>">
+		<span class="tcmha-drag" aria-hidden="true" title="<?php esc_attr_e( 'Drag to move', 'tcmha' ); ?>"></span>
 		<input type="hidden" name="<?php echo esc_attr( $name ); ?>[id]" value="<?php echo esc_attr( $o['id'] ); ?>">
 		<div class="tcmha-opt__text">
 			<label for="<?php echo esc_attr( $fid ); ?>"><?php esc_html_e( 'Choice', 'tcmha' ); ?></label>
@@ -221,13 +230,21 @@ function tcmha_survey_admin_question( $q, $number ) {
 	?>
 	<div class="tcmha-q" data-q="<?php echo esc_attr( $q['id'] ); ?>" role="group" aria-labelledby="<?php echo esc_attr( $fid ); ?>-title">
 		<div class="tcmha-q__head">
-			<h3 class="tcmha-q__title" id="<?php echo esc_attr( $fid ); ?>-title"><?php esc_html_e( 'Question', 'tcmha' ); ?> <span class="tcmha-q__num"><?php echo (int) $number; ?></span></h3>
+			<span class="tcmha-drag" aria-hidden="true" title="<?php esc_attr_e( 'Drag to move', 'tcmha' ); ?>"></span>
+			<h3 class="tcmha-q__title" id="<?php echo esc_attr( $fid ); ?>-title">
+				<button type="button" class="tcmha-q__toggle" aria-expanded="true" aria-controls="<?php echo esc_attr( $fid ); ?>-body">
+					<span class="tcmha-q__label"><?php esc_html_e( 'Question', 'tcmha' ); ?> <span class="tcmha-q__num"><?php echo (int) $number; ?></span><span class="screen-reader-text">:</span></span>
+					<span class="tcmha-q__summary"><?php echo esc_html( '' !== $q['text'] ? $q['text'] : __( '(no question yet)', 'tcmha' ) ); ?></span>
+					<span class="tcmha-q__meta"></span>
+				</button>
+			</h3>
 			<div class="tcmha-q__tools">
 				<button type="button" class="button tcmha-q-up"><?php esc_html_e( 'Move up', 'tcmha' ); ?><span class="screen-reader-text"> <?php esc_html_e( '(question)', 'tcmha' ); ?></span></button>
 				<button type="button" class="button tcmha-q-down"><?php esc_html_e( 'Move down', 'tcmha' ); ?><span class="screen-reader-text"> <?php esc_html_e( '(question)', 'tcmha' ); ?></span></button>
 				<button type="button" class="button-link button-link-delete tcmha-q-remove"><?php esc_html_e( 'Remove question', 'tcmha' ); ?></button>
 			</div>
 		</div>
+		<div class="tcmha-q__body" id="<?php echo esc_attr( $fid ); ?>-body">
 		<input type="hidden" name="<?php echo esc_attr( $name ); ?>[id]" value="<?php echo esc_attr( $q['id'] ); ?>">
 
 		<div class="tcmha-field">
@@ -284,6 +301,7 @@ function tcmha_survey_admin_question( $q, $number ) {
 			</ul>
 			<button type="button" class="button tcmha-o-add"><?php esc_html_e( 'Add a choice', 'tcmha' ); ?></button>
 		</div>
+		</div>
 	</div>
 	<?php
 }
@@ -329,6 +347,11 @@ function tcmha_survey_questions_box( $post ) {
 		<span class="description"><?php esc_html_e( 'Shown above the questions, as links. Example: a PDF that explains the logo ideas. Up to 10. Anyone with a file\'s address can open it, so don\'t add private documents.', 'tcmha' ); ?></span>
 
 		<h3><?php esc_html_e( 'Questions', 'tcmha' ); ?></h3>
+		<p class="tcmha-qs__bar">
+			<span class="description"><?php esc_html_e( 'Click a question to open it. Drag the dotted handle, or use Move up and Move down, to change the order.', 'tcmha' ); ?></span>
+			<button type="button" class="button-link tcmha-q-expand-all"><?php esc_html_e( 'Open all', 'tcmha' ); ?></button>
+			<button type="button" class="button-link tcmha-q-collapse-all"><?php esc_html_e( 'Close all', 'tcmha' ); ?></button>
+		</p>
 		<div class="tcmha-qs">
 			<?php
 			foreach ( $questions as $i => $q ) {

@@ -27,7 +27,45 @@
 	margin: 0 0 1.25em;
 }
 .tcmha-q__head { display: flex; flex-wrap: wrap; gap: 0.5em 1em; align-items: center; justify-content: space-between; border-bottom: 1px solid #dcdcde; }
+<<<<<<< HEAD
+.tcmha-poll-admin .tcmha-q__title { flex: 1 1 20em; min-width: 0; border: 0; margin: 0; padding: 0; font-size: 1em; }
+.tcmha-q__head { flex-wrap: nowrap; }
+@media (max-width: 960px) { .tcmha-q__head { flex-wrap: wrap; } }
+.tcmha-q__toggle {
+	display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.15em 0.75em;
+	width: 100%; min-height: 44px; margin: 0; padding: 0.6em 0 0.6em 1.6em; position: relative;
+	border: 0; background: none; color: #1d2327; font: inherit; text-align: left; cursor: pointer;
+}
+.tcmha-q__toggle::before {
+	content: ""; position: absolute; left: 0.2em; top: 1.05em;
+	width: 0.5em; height: 0.5em; border-right: 2px solid #625778; border-bottom: 2px solid #625778;
+	transform: rotate(-45deg); transition: transform 0.15s ease;
+}
+.tcmha-q__toggle[aria-expanded="true"]::before { transform: rotate(45deg); top: 0.85em; }
+.tcmha-q__toggle:hover .tcmha-q__summary { text-decoration: underline; }
+.tcmha-q__toggle:focus-visible { outline: 2px solid #2271b1; outline-offset: 2px; border-radius: 3px; }
+.tcmha-q__label { color: #625778; font-weight: 700; white-space: nowrap; }
+.tcmha-q__summary { font-weight: 600; font-size: 1.05em; min-width: 0; overflow-wrap: anywhere; }
+.tcmha-q__meta { color: #50575e; font-weight: 400; font-size: 0.9em; }
+.tcmha-q:not(.is-open) { padding-bottom: 0; }
+.tcmha-q:not(.is-open) .tcmha-q__head { border-bottom: 0; }
+.tcmha-qs__bar { display: flex; flex-wrap: wrap; gap: 0.5em 1.25em; align-items: center; }
+.tcmha-qs__bar .description { margin: 0; flex: 1 1 24em; }
+.tcmha-qs__bar .button-link { min-height: 32px; }
+
+/* Drag handles */
+.tcmha-drag {
+	flex: none; width: 14px; height: 22px; cursor: grab; opacity: 0.7;
+	background: radial-gradient(circle, #50575e 1.5px, transparent 2px) 0 0 / 7px 7px;
+}
+.tcmha-drag:hover { opacity: 1; }
+.tcmha-q.is-dragging, .tcmha-opt.is-dragging { opacity: 0.45; outline: 2px dashed #625778; }
+.tcmha-opt { position: relative; padding-left: 2.25em !important; }
+.tcmha-opt > .tcmha-drag { position: absolute; left: 0.75em; top: 1em; }
+@media (prefers-reduced-motion: reduce) { .tcmha-q__toggle::before { transition: none; } }
+=======
 .tcmha-poll-admin .tcmha-q__title { border: 0; margin: 0.75em 0; padding: 0; font-size: 1.1em; color: #625778; }
+>>>>>>> origin/claude/project-thread-wzfety
 .tcmha-q__tools, .tcmha-opt__tools { display: flex; flex-wrap: wrap; gap: 0.5em 1em; align-items: center; }
 .tcmha-q__tools .button, .tcmha-opt__tools .button-link, .tcmha-q__tools .button-link { min-height: 32px; }
 

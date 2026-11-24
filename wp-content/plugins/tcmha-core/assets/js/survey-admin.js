@@ -51,6 +51,43 @@
 		} );
 	}
 
+<<<<<<< HEAD
+	// Accordion: a closed question shows one line (number, question, type, choices).
+	function summarize( q ) {
+		var text = q.querySelector( '.tcmha-q__text' ).value.trim();
+		var type = q.querySelector( '.tcmha-q__type' ).value;
+		var parts = [ type === 'text' ? t.typeText : ( type === 'multiple' ? t.typeMultiple : t.typeSingle ) ];
+		if ( type !== 'text' ) {
+			var n = Array.prototype.filter.call( q.querySelectorAll( '.tcmha-opt input[type="text"]' ), function ( input ) {
+				return input.value.trim() !== '' || input.closest( '.tcmha-opt' ).querySelector( '[data-kind="image"] .tcmha-media__id' ).value !== '';
+			} ).length;
+			parts.push( n === 1 ? t.oneChoice : ( t.choices || '%d choices' ).replace( '%d', n ) );
+		}
+		var req = q.querySelector( 'input[type="checkbox"][name$="[required]"]' );
+		if ( req && req.checked ) {
+			parts.push( t.requiredShort );
+		}
+		q.querySelector( '.tcmha-q__summary' ).textContent = text || t.noText;
+		q.querySelector( '.tcmha-q__meta' ).textContent = parts.join( ' · ' );
+	}
+
+	function setOpen( q, open ) {
+		q.querySelector( '.tcmha-q__toggle' ).setAttribute( 'aria-expanded', open ? 'true' : 'false' );
+		q.querySelector( '.tcmha-q__body' ).hidden = ! open;
+		q.classList.toggle( 'is-open', open );
+		if ( ! open ) {
+			summarize( q );
+		}
+	}
+
+	function openOnly( q ) {
+		questions().forEach( function ( other ) {
+			setOpen( other, other === q );
+		} );
+	}
+
+=======
+>>>>>>> origin/claude/project-thread-wzfety
 	function addOption( q, focus ) {
 		var html = oTemplate.split( '__Q__' ).join( q.getAttribute( 'data-q' ) ).split( '__O__' ).join( uid( 'o' ) );
 		var el = fromHTML( html );
@@ -68,6 +105,10 @@
 		addOption( el );
 		syncType( el );
 		renumber();
+<<<<<<< HEAD
+		openOnly( el );
+=======
+>>>>>>> origin/claude/project-thread-wzfety
 		el.querySelector( '.tcmha-q__text' ).focus();
 		say( t.added || 'Added.' );
 	}
@@ -200,14 +241,33 @@
 		var o = btn.closest( '.tcmha-opt' );
 		var c = btn.classList;
 
+<<<<<<< HEAD
+		if ( c.contains( 'tcmha-q__toggle' ) ) {
+			if ( btn.getAttribute( 'aria-expanded' ) === 'true' ) {
+				setOpen( q, false );
+			} else {
+				openOnly( q );
+			}
+		} else if ( c.contains( 'tcmha-q-expand-all' ) || c.contains( 'tcmha-q-collapse-all' ) ) {
+			var openAll = c.contains( 'tcmha-q-expand-all' );
+			questions().forEach( function ( each ) {
+				setOpen( each, openAll );
+			} );
+		} else if ( c.contains( 'tcmha-q-add' ) ) {
+=======
 		if ( c.contains( 'tcmha-q-add' ) ) {
+>>>>>>> origin/claude/project-thread-wzfety
 			addQuestion();
 		} else if ( c.contains( 'tcmha-q-up' ) || c.contains( 'tcmha-q-down' ) ) {
 			var up = c.contains( 'tcmha-q-up' );
 			if ( move( q, '.tcmha-q', up ) ) {
 				renumber();
 				btn.focus();
+<<<<<<< HEAD
+				say( ( t.movedTo || '' ).replace( '%1$d', questions().indexOf( q ) + 1 ).replace( '%2$d', questions().length ) );
+=======
 				say( ( up ? t.movedUp : t.movedDown ) + ' ' + q.querySelector( '.tcmha-q__title' ).textContent.trim() );
+>>>>>>> origin/claude/project-thread-wzfety
 			}
 		} else if ( c.contains( 'tcmha-q-remove' ) ) {
 			if ( ! window.confirm( t.removeQuestion || 'Remove this question?' ) ) {
@@ -216,7 +276,11 @@
 			var next = q.nextElementSibling || q.previousElementSibling;
 			q.remove();
 			renumber();
+<<<<<<< HEAD
+			( next ? next.querySelector( '.tcmha-q__toggle' ) : root.querySelector( '.tcmha-q-add' ) ).focus();
+=======
 			( next ? next.querySelector( '.tcmha-q__text' ) : root.querySelector( '.tcmha-q-add' ) ).focus();
+>>>>>>> origin/claude/project-thread-wzfety
 			say( t.removed || 'Removed.' );
 		} else if ( c.contains( 'tcmha-o-add' ) ) {
 			addOption( q, true );
@@ -250,5 +314,94 @@
 		}
 	} );
 
+<<<<<<< HEAD
+	root.addEventListener( 'input', function ( e ) {
+		if ( e.target.classList.contains( 'tcmha-q__text' ) ) {
+			e.target.closest( '.tcmha-q' ).querySelector( '.tcmha-q__summary' ).textContent = e.target.value.trim() || t.noText;
+		}
+	} );
+
+	// Drag and drop by the dotted handle, for questions and for choices inside a question.
+	// Keyboard and screen reader users use the Move up and Move down buttons.
+	var dragging = null;
+	root.addEventListener( 'pointerdown', function ( e ) {
+		var handle = e.target.closest( '.tcmha-drag' );
+		if ( ! handle ) {
+			return;
+		}
+		var item = handle.parentElement.matches( '.tcmha-opt' ) ? handle.parentElement : handle.closest( '.tcmha-q' );
+		item.draggable = true;
+	} );
+	root.addEventListener( 'dragstart', function ( e ) {
+		if ( ! e.target.draggable ) {
+			return;
+		}
+		e.stopPropagation();
+		dragging = e.target;
+		e.dataTransfer.effectAllowed = 'move';
+		e.dataTransfer.setData( 'text/plain', '' );
+		window.setTimeout( function () {
+			dragging && dragging.classList.add( 'is-dragging' );
+		}, 0 );
+	} );
+	root.addEventListener( 'dragover', function ( e ) {
+		if ( ! dragging ) {
+			return;
+		}
+		var selector = dragging.classList.contains( 'tcmha-opt' ) ? '.tcmha-opt' : '.tcmha-q';
+		var over = e.target.closest( selector );
+		if ( ! over || over === dragging || over.parentElement !== dragging.parentElement ) {
+			return;
+		}
+		e.preventDefault();
+		var box = over.getBoundingClientRect();
+		if ( e.clientY < box.top + box.height / 2 ) {
+			over.before( dragging );
+		} else {
+			over.after( dragging );
+		}
+	} );
+	root.addEventListener( 'drop', function ( e ) {
+		if ( dragging ) {
+			e.preventDefault();
+		}
+	} );
+	root.addEventListener( 'dragend', function () {
+		if ( ! dragging ) {
+			return;
+		}
+		dragging.classList.remove( 'is-dragging' );
+		dragging.draggable = false;
+		if ( dragging.classList.contains( 'tcmha-q' ) ) {
+			renumber();
+			var all = questions();
+			say( ( t.movedTo || '' ).replace( '%1$d', all.indexOf( dragging ) + 1 ).replace( '%2$d', all.length ) );
+		}
+		dragging = null;
+	} );
+	root.addEventListener( 'pointerup', function () {
+		root.querySelectorAll( '[draggable="true"]' ).forEach( function ( el ) {
+			if ( el !== dragging ) {
+				el.draggable = false;
+			}
+		} );
+	} );
+
+	questions().forEach( function ( q ) {
+		syncType( q );
+		summarize( q );
+	} );
+	// Start closed when there is more than one question, so the list is short.
+	if ( questions().length > 1 ) {
+		questions().forEach( function ( q ) {
+			setOpen( q, false );
+		} );
+	} else {
+		questions().forEach( function ( q ) {
+			setOpen( q, true );
+		} );
+	}
+=======
 	questions().forEach( syncType );
+>>>>>>> origin/claude/project-thread-wzfety
 }() );
