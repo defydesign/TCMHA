@@ -1,4 +1,10 @@
 /* Persistent crisis bar. Colors come from theme tokens, with safe fallbacks. */
+
+/* Keep focused or linked-to content from hiding under the sticky bar (WCAG 2.4.11). */
+html {
+	scroll-padding-top: 5.5rem;
+}
+
 .tcmha-crisis-bar {
 	position: sticky;
 	top: 0;
