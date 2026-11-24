@@ -174,6 +174,7 @@ function tcmha_admin_menu_priorities() {
 			'edit.php?post_type=tcmha_resource',
 			'edit.php?post_type=tcmha_provider',
 			'edit.php?post_type=tcmha_glossary',
+			'edit.php?post_type=tcmha_survey',
 			'edit.php?post_type=tcmha_poll',
 			'edit.php',
 			'upload.php',
@@ -380,6 +381,7 @@ function tcmha_admin_quick_links() {
 		'tcmha_resource' => __( 'Add a resource', 'tcmha' ),
 		'tcmha_provider' => __( 'Add a provider', 'tcmha' ),
 		'tcmha_glossary' => __( 'Add a glossary word', 'tcmha' ),
+		'tcmha_survey'   => __( 'Start a poll', 'tcmha' ),
 		'tcmha_poll'     => __( 'Start a meeting poll', 'tcmha' ),
 	);
 	foreach ( $types as $type => $label ) {

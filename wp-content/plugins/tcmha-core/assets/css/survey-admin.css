@@ -1,0 +1,73 @@
+/* Poll admin (edit screen). Matches the meeting poll admin boxes. */
+.tcmha-poll-admin-note { margin: 1em 0 0.5em; max-width: 60em; }
+.tcmha-poll-admin h3 { margin: 1.5em 0 0.25em; padding-bottom: 0.35em; border-bottom: 1px solid #dcdcde; font-size: 1.05em; }
+.tcmha-poll-admin h3:first-of-type { margin-top: 0.5em; }
+.tcmha-poll-admin .tcmha-field { margin: 1em 0; border: 0; padding: 0; }
+.tcmha-poll-admin .tcmha-field > label,
+.tcmha-poll-admin .tcmha-field > .tcmha-label,
+.tcmha-poll-admin .tcmha-field-row label:first-child,
+.tcmha-poll-admin legend.tcmha-label { display: block; font-weight: 600; margin-bottom: 0.3em; }
+.tcmha-poll-admin .description { display: block; margin-top: 0.35em; max-width: 52em; }
+.tcmha-poll-howto ol { margin: 0.5em 0 0 1.25em; }
+.tcmha-poll-howto li { margin-bottom: 0.6em; }
+
+.tcmha-field--row { display: flex; flex-wrap: wrap; gap: 1em 2em; align-items: flex-start; }
+.tcmha-field--row > div > label:first-child,
+.tcmha-field--row > div > .tcmha-label { display: block; font-weight: 600; margin-bottom: 0.3em; }
+.tcmha-field--row > div { max-width: 26em; }
+.tcmha-poll-admin [hidden] { display: none !important; }
+
+/* Questions */
+.tcmha-q {
+	border: 1px solid #c3c4c7;
+	border-left: 4px solid #625778;
+	border-radius: 6px;
+	background: #fff;
+	padding: 0.25em 1.25em 1em;
+	margin: 0 0 1.25em;
+}
+.tcmha-q__head { display: flex; flex-wrap: wrap; gap: 0.5em 1em; align-items: center; justify-content: space-between; border-bottom: 1px solid #dcdcde; }
+.tcmha-poll-admin .tcmha-q__title { border: 0; margin: 0.75em 0; padding: 0; font-size: 1.1em; color: #625778; }
+.tcmha-q__tools, .tcmha-opt__tools { display: flex; flex-wrap: wrap; gap: 0.5em 1em; align-items: center; }
+.tcmha-q__tools .button, .tcmha-opt__tools .button-link, .tcmha-q__tools .button-link { min-height: 32px; }
+
+/* Choices */
+.tcmha-opts { list-style: none; margin: 0.5em 0 0.75em; padding: 0; }
+.tcmha-opt {
+	display: grid;
+	grid-template-columns: minmax(14em, 1fr) auto;
+	gap: 0.5em 1.5em;
+	align-items: start;
+	background: #f6f4f9;
+	border: 1px solid #dcd5e6;
+	border-radius: 6px;
+	padding: 0.75em 1em;
+	margin: 0 0 0.5em;
+}
+.tcmha-opt__text label { display: block; font-weight: 600; margin-bottom: 0.25em; }
+.tcmha-opt__text input { width: 100%; }
+.tcmha-opt__media { display: flex; flex-wrap: wrap; gap: 0.75em 1.5em; }
+.tcmha-opt__tools { grid-column: 1 / -1; }
+@media (max-width: 782px) {
+	.tcmha-opt { grid-template-columns: 1fr; }
+}
+
+/* Pickers */
+.tcmha-media { display: flex; flex-wrap: wrap; gap: 0.5em; align-items: center; }
+.tcmha-media__preview { display: inline-flex; flex-wrap: wrap; gap: 0.5em; align-items: center; }
+.tcmha-media__preview:empty { display: none; }
+.tcmha-media__preview img { width: 64px; height: 64px; object-fit: contain; background: #fff; border: 1px solid #c3c4c7; border-radius: 4px; }
+.tcmha-media__warn { display: block; max-width: 22em; color: #8a2424; font-size: 12px; }
+.tcmha-media__name { font-family: Consolas, Monaco, monospace; font-size: 12px; word-break: break-all; }
+.tcmha-media .button, .tcmha-media .button-link { min-height: 32px; }
+
+.tcmha-files { display: block; }
+.tcmha-files__list { list-style: none; margin: 0 0 0.5em; padding: 0; }
+.tcmha-files__list li { display: flex; gap: 1em; align-items: center; margin: 0 0 0.35em; }
+
+/* Answers box */
+.tcmha-survey-actions { display: flex; flex-wrap: wrap; gap: 0.5em 1em; align-items: center; }
+.tcmha-survey-result-title { margin: 1.5em 0 0.5em; font-size: 1em; }
+.tcmha-survey-table th img { vertical-align: middle; width: 48px; height: 48px; object-fit: contain; margin-right: 0.35em; }
+.tcmha-survey-texts { margin: 0 0 1em 1.25em; list-style: disc; }
+.tcmha-survey-texts li { margin-bottom: 0.5em; max-width: 60em; }
