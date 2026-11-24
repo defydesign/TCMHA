@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       TCMHA Core
  * Description:       Content model, shared taxonomy, persistent crisis actions, meeting polls, general polls with pictures, and a branded admin for the Teller County Mental Health Alliance site.
- * Version:           0.6.1
+ * Version:           0.6.2
  * Requires at least: 6.6
  * Requires PHP:      8.1
  * Author:            Storiline LLC
@@ -13,7 +13,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'TCMHA_CORE_VERSION', '0.6.1' );
+define( 'TCMHA_CORE_VERSION', '0.6.2' );
 define( 'TCMHA_CORE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'TCMHA_CORE_URL', plugin_dir_url( __FILE__ ) );
 
