@@ -1,0 +1,471 @@
+/* Polls (general). Builds on meeting-poll.css: tokens, notices, fields, buttons, page chrome. */
+
+.tcmha-survey .tcmha-survey__title {
+	margin-top: 0;
+}
+
+.tcmha-survey__intro {
+	color: var(--poll-muted);
+}
+
+/* Each box sets its own top spacing (overrides the meeting poll page's first-heading margin). */
+.tcmha-poll-body .tcmha-survey .tcmha-survey__q-title,
+.tcmha-poll-body .tcmha-survey .tcmha-survey__files-title,
+.tcmha-poll-body .tcmha-survey .tcmha-survey__results > h2,
+.tcmha-poll-body .tcmha-survey .tcmha-poll__picked > h2 {
+	margin-top: 0;
+}
+
+/* Files to look at */
+.tcmha-survey__files {
+	background: #fff;
+	border: 2px solid var(--poll-lavender);
+	border-radius: var(--poll-radius);
+	padding: 1rem 1.25rem;
+	margin: 0 0 1.5rem;
+}
+
+.tcmha-survey .tcmha-survey__files-title {
+	font-size: 1.2rem;
+	margin: 0 0 0.5rem;
+}
+
+.tcmha-survey__files ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.tcmha-survey__files li + li {
+	margin-top: 0.35rem;
+}
+
+/* Links to files and larger pictures */
+.tcmha-survey__file,
+.tcmha-survey__zoom {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0 0.3rem;
+	min-height: 44px;
+	color: var(--poll-primary);
+	font-weight: 600;
+	text-decoration: underline;
+	text-underline-offset: 0.15em;
+}
+
+.tcmha-survey__file:hover,
+.tcmha-survey__zoom:hover {
+	color: var(--poll-ink);
+	text-decoration-thickness: 2px;
+}
+
+.tcmha-survey__file-facts {
+	color: var(--poll-muted);
+	font-weight: 400;
+}
+
+/* Questions */
+.tcmha-survey__form .tcmha-poll__who {
+	margin-bottom: 1.5rem;
+}
+
+.tcmha-survey__q {
+	background: #fff;
+	border: 2px solid var(--poll-lavender);
+	border-radius: var(--poll-radius);
+	padding: 1.25rem;
+	margin: 0 0 1.25rem;
+}
+
+.tcmha-survey__q.has-error {
+	border-color: #a3261b;
+}
+
+.tcmha-survey__fieldset {
+	border: 0;
+	margin: 0;
+	padding: 0;
+	min-width: 0;
+}
+
+.tcmha-survey__legend {
+	padding: 0;
+	float: left; /* Lets the legend sit inside the box and wrap like a normal heading. */
+	width: 100%;
+}
+
+.tcmha-survey__legend + * {
+	clear: both;
+}
+
+.tcmha-survey .tcmha-survey__q-title {
+	color: var(--poll-primary);
+	font-size: 1.35rem;
+	line-height: 1.25;
+	margin: 0 0 0.35rem;
+}
+
+.tcmha-survey__q-title label {
+	cursor: default;
+}
+
+.tcmha-survey__how,
+.tcmha-survey__help {
+	color: var(--poll-muted);
+	margin: 0 0 0.75rem;
+}
+
+.tcmha-survey__how {
+	font-weight: 600;
+}
+
+.tcmha-survey__q-image {
+	margin: 0 0 0.75rem;
+}
+
+.tcmha-survey__q-image img {
+	display: block;
+	max-width: 100%;
+	height: auto;
+	border-radius: 0.75rem;
+	border: 1px solid var(--tcmha-color-border, #d9d2e3);
+}
+
+.tcmha-survey__q-image figcaption,
+.tcmha-survey__q-file {
+	margin: 0.25rem 0 0.75rem;
+}
+
+.tcmha-survey__error {
+	color: #a3261b;
+	font-weight: 700;
+	margin: 0 0 0.75rem;
+}
+
+.tcmha-survey__error::before {
+	content: "! ";
+}
+
+/* Choices */
+.tcmha-survey__options {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: 0.6rem;
+}
+
+.tcmha-survey__options.has-images {
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+	gap: 1rem;
+}
+
+.tcmha-survey__option {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.tcmha-survey__choice {
+	position: relative;
+	display: block;
+	cursor: pointer;
+	flex: 1 1 auto;
+}
+
+.tcmha-survey__choice input {
+	position: absolute;
+	opacity: 0;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	cursor: pointer;
+}
+
+.tcmha-survey__card {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	box-sizing: border-box;
+	border: 2px solid var(--poll-slate);
+	border-radius: 1rem;
+	background: #fff;
+	overflow: hidden;
+	transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tcmha-survey__choice:hover .tcmha-survey__card {
+	border-color: var(--poll-primary);
+}
+
+.tcmha-survey__img {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	aspect-ratio: 4 / 3;
+	background: #fff;
+	border-bottom: 1px solid var(--tcmha-color-border, #d9d2e3);
+	padding: 0.75rem;
+}
+
+.tcmha-survey__img img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+}
+
+.tcmha-survey__label {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	min-height: 48px;
+	padding: 0.5rem 0.9rem;
+	font-weight: 600;
+	line-height: 1.3;
+	box-sizing: border-box;
+}
+
+/* The round (one choice) or square (several choices) marker. */
+.tcmha-survey__label::before {
+	content: "";
+	flex: none;
+	width: 1.15rem;
+	height: 1.15rem;
+	border: 2px solid currentColor;
+	border-radius: 50%;
+	box-sizing: border-box;
+	background: #fff;
+}
+
+.tcmha-survey__choice input[type="checkbox"] + .tcmha-survey__card .tcmha-survey__label::before {
+	border-radius: 0.25rem;
+}
+
+.tcmha-survey__choice input:checked + .tcmha-survey__card {
+	border-color: var(--poll-primary);
+	background: var(--poll-surface-alt);
+	box-shadow: 0 0 0 2px var(--poll-primary);
+}
+
+.tcmha-survey__choice input:checked + .tcmha-survey__card .tcmha-survey__label {
+	color: var(--poll-primary);
+}
+
+.tcmha-survey__choice input[type="radio"]:checked + .tcmha-survey__card .tcmha-survey__label::before {
+	background: var(--poll-primary);
+	box-shadow: inset 0 0 0 3px #fff;
+}
+
+.tcmha-survey__choice input[type="checkbox"]:checked + .tcmha-survey__card .tcmha-survey__label::before {
+	background: var(--poll-primary) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3 3 7-7' fill='none' stroke='%23fff' stroke-width='2.5'/%3E%3C/svg%3E") center / 85% no-repeat;
+	border-color: var(--poll-primary);
+}
+
+.tcmha-survey__choice input:focus-visible + .tcmha-survey__card {
+	outline: 3px solid var(--poll-focus);
+	outline-offset: 3px;
+}
+
+.tcmha-survey__extras {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0 1rem;
+	margin: 0.15rem 0 0;
+	font-size: 0.95rem;
+}
+
+.tcmha-survey textarea {
+	display: block;
+	width: 100%;
+	box-sizing: border-box;
+	min-height: 7rem;
+	padding: 0.6rem 0.85rem;
+	border: 2px solid var(--poll-slate);
+	border-radius: 0.75rem;
+	background: #fff;
+	color: var(--poll-ink);
+	font: inherit;
+	line-height: 1.5;
+}
+
+.tcmha-survey textarea + .tcmha-poll__hint {
+	display: block;
+	margin: 0.35rem 0 0.5rem;
+}
+
+.tcmha-survey__limit:empty {
+	display: none;
+}
+
+.tcmha-survey__limit {
+	margin: 0.6rem 0 0;
+	font-weight: 600;
+}
+
+/* "Change my answers" after results */
+.tcmha-survey__change {
+	margin-top: 1.5rem;
+}
+
+.tcmha-survey__change > summary {
+	display: inline-flex;
+	align-items: center;
+	min-height: 48px;
+	padding: 0.5rem 1.4rem;
+	border: 2px solid var(--poll-primary);
+	border-radius: var(--tcmha-radius-pill, 999px);
+	background: #fff;
+	color: var(--poll-primary);
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.tcmha-survey__change > summary:hover {
+	background: var(--poll-surface-alt);
+}
+
+.tcmha-survey__change[open] > summary {
+	margin-bottom: 1.25rem;
+}
+
+/* Results */
+.tcmha-survey__results {
+	background: #fff;
+	border: 2px solid var(--poll-lavender);
+	border-radius: var(--poll-radius);
+	padding: 1.25rem;
+	margin: 0 0 1.5rem;
+}
+
+.tcmha-survey__results > :first-child {
+	margin-top: 0;
+}
+
+.tcmha-survey__result + .tcmha-survey__result {
+	border-top: 1px solid var(--tcmha-color-border, #d9d2e3);
+	margin-top: 1rem;
+	padding-top: 0.5rem;
+}
+
+.tcmha-survey .tcmha-survey__result-title {
+	font-size: 1.15rem;
+	margin: 0.75rem 0 0.5rem;
+}
+
+.tcmha-survey__bars {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: 0.75rem;
+}
+
+.tcmha-survey__bar-row {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.tcmha-survey__thumb img {
+	display: block;
+	width: 3.5rem;
+	height: 3.5rem;
+	object-fit: contain;
+	background: #fff;
+	border: 1px solid var(--tcmha-color-border, #d9d2e3);
+	border-radius: 0.5rem;
+}
+
+.tcmha-survey__bar-text {
+	flex: 1 1 auto;
+	display: grid;
+	grid-template-columns: 1fr auto;
+	gap: 0.25rem 0.75rem;
+	align-items: baseline;
+	min-width: 0;
+}
+
+.tcmha-survey__bar-label {
+	font-weight: 600;
+}
+
+.tcmha-survey__bar-count {
+	color: var(--poll-muted);
+	font-size: 0.95rem;
+	text-align: right;
+}
+
+.tcmha-survey__bar-text .tcmha-poll__bar {
+	grid-column: 1 / -1;
+}
+
+/* Bigger picture pop-up (assets/js/survey.js) */
+.tcmha-survey__dialog {
+	max-width: min(64rem, calc(100vw - 2rem));
+	max-height: calc(100vh - 2rem);
+	padding: 1rem;
+	border: 0;
+	border-radius: var(--poll-radius);
+	box-sizing: border-box;
+	background: #fff;
+}
+
+.tcmha-survey__dialog::backdrop {
+	background: rgb(30 26 34 / 0.75);
+}
+
+.tcmha-survey__dialog form {
+	display: flex;
+	justify-content: flex-end;
+	margin: 0 0 0.75rem;
+}
+
+.tcmha-survey__dialog img {
+	display: block;
+	max-width: 100%;
+	max-height: calc(100vh - 12rem);
+	width: auto;
+	height: auto;
+	margin: 0 auto;
+	object-fit: contain;
+}
+
+.tcmha-survey__dialog-cap {
+	margin: 0.75rem 0 0;
+	text-align: center;
+	font-weight: 700;
+}
+
+@media (max-width: 40rem) {
+	.tcmha-survey__q,
+	.tcmha-survey__results {
+		padding: 1rem 0.85rem;
+	}
+
+	.tcmha-survey__bar-text {
+		grid-template-columns: 1fr;
+	}
+
+	.tcmha-survey__bar-count {
+		text-align: left;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.tcmha-survey__card {
+		transition: none;
+	}
+}
+
+@media (forced-colors: active) {
+	.tcmha-survey__choice input:checked + .tcmha-survey__card {
+		outline: 4px solid Highlight;
+	}
+
+	.tcmha-survey__choice input:checked + .tcmha-survey__card .tcmha-survey__label::before {
+		background: Highlight;
+	}
+}
